@@ -41,25 +41,20 @@ private:
     std::vector<Molcule> molecules;
     std::vector<Bond> bonds;
 
-    // 생성자 - 외부에서 생성 못함
     ObjectContainer() = default;
 
 public:
-    // 싱글턴 인스턴스 접근자
     static ObjectContainer& Get()
     {
         static ObjectContainer instance;
         return instance;
     }
 
-    // 복사/대입 막기
     ObjectContainer(const ObjectContainer&) = delete;
     ObjectContainer& operator=(const ObjectContainer&) = delete;
 
-    // 원자 추가
     int AddMolecule(const std::string& name, ColorName color, double size, float x, float y, float z);
 
-    // 결합 추가
     int AddBond(int from_id, int to_id, BondDirection direction, int order = 1);
 
     // 조회
