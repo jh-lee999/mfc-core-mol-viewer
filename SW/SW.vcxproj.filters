@@ -28,6 +28,9 @@
     <Filter Include="OpenGL">
       <UniqueIdentifier>{69b082bf-9d75-482a-b835-64c83a00c820}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OpenGL\Singleton">
+      <UniqueIdentifier>{7b2da6ca-8de2-43b9-bd83-3eff726be2b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SW.h">
@@ -78,6 +81,12 @@
     <ClInclude Include="OpenGLMouseController.h">
       <Filter>OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectContainer.h">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="Colors.h">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SW.cpp">
@@ -115,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="OpenGLMouseController.cpp">
       <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectContainer.cpp">
+      <Filter>OpenGL\Singleton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

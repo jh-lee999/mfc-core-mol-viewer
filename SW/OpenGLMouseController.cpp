@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "OpenGLMouseController.h"
 
 void OpenGLMouseController::StartDrag(CPoint pt)
@@ -19,15 +19,15 @@ void OpenGLMouseController::UpdateDrag(UINT nFlags, CPoint pt, ViewerStyle style
     float dx = static_cast<float>(pt.x - m_lastMouse.x);
     float dy = static_cast<float>(pt.y - m_lastMouse.y);
 
-    float zoom = gl.Getzoom();
+    float zoom = gl.Getzoom();  
     float scale = (style == Viewer3D) ? fabs(zoom) * 0.001f : 1.0f;
-
+    float rotateScale = max(0.5f, fabs(zoom) * 0.2f);
     if (nFlags & MK_LBUTTON)
     {
         if (style == Viewer3D)
         {
-            m_yaw += dx * 0.5f;
-            m_pitch += dy * 0.5f;
+            m_yaw += dx * rotateScale;
+            m_pitch += dy * rotateScale;
         }
     }
     else if (nFlags & MK_RBUTTON)

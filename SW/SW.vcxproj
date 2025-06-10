@@ -190,6 +190,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Colors.h" />
     <ClInclude Include="DlgInquiryLog.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Log.h" />
@@ -206,10 +207,12 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="VersionDef.h" />
     <ClInclude Include="ViewMain.h" />
+    <ClInclude Include="ObjectContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DlgInquiryLog.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="ObjectContainer.cpp" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="OpenGLMouseController.cpp" />
     <ClCompile Include="pch.cpp">
