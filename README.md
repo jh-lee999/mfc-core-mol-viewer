@@ -1,3 +1,3 @@
-# MFC_Form
+# Mol Viewer
 
-GL TEST
+Personal application software to understand material structure in depth.
