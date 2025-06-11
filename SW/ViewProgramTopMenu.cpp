@@ -6,8 +6,9 @@
 #include "afxdialogex.h"
 #include "SWDlg.h"
 #include "ViewProgramTopMenu.h"
-
 #include "DlgInquiryLog.h"
+#include "OpenGL.h"
+#include "ViewMain.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -55,8 +56,47 @@ void ViewProgramTopMenu::DoDataExchange(CDataExchange* pDX)
 	StyleDialog::DoDataExchange(pDX);
 }
 BEGIN_MESSAGE_MAP(ViewProgramTopMenu, StyleDialog)
+	ON_BN_CLICKED(IDC_ADDATOM, &ViewProgramTopMenu::OnBnClickedAddatom)
+	ON_BN_CLICKED(IDC_BTN_DATA_TEST, &ViewProgramTopMenu::OnBnClickedBtnDataTest)
 END_MESSAGE_MAP()
 
 
 
 
+
+
+void ViewProgramTopMenu::OnBnClickedAddatom()
+{
+	BOOL isChecked = (IsDlgButtonChecked(IDC_ADDATOM) == BST_CHECKED);
+	HWND hMainWnd = g_program->GetMVInstance()->GetSafeHwnd();
+	if (isChecked)
+	{
+		::PostMessage(hMainWnd, WM_USER_ADD_ATOM_MODE, 1, 0);  // 1은 활성화
+	}
+	else
+	{
+		::PostMessage(hMainWnd, WM_USER_ADD_ATOM_MODE, 0, 0);  // 0은 비활성화 (선택)
+	}
+}
+
+
+void ViewProgramTopMenu::OnBnClickedBtnDataTest()
+{
+	HWND hMainWnd = g_program->GetMVInstance()->GetSafeHwnd();
+	CFileDialog dlg(TRUE, _T("txt"), nullptr,
+		OFN_FILEMUSTEXIST | OFN_HIDEREADONLY,
+		_T("Molecule Files (*.txt;*.mol)|*.txt;*.mol|All Files (*.*)|*.*||"),
+		this);
+
+	if (dlg.DoModal() == IDOK)
+	{
+		CString path = dlg.GetPathName();
+
+		if (::IsWindow(hMainWnd))
+		{
+			// CString → std::wstring → LPWSTR
+			std::wstring* pStr = new std::wstring(path.GetString());
+			::PostMessage(hMainWnd, WM_LOAD_MOLECULE_FILE, 0, reinterpret_cast<LPARAM>(pStr));
+		}
+	}
+}

@@ -3,7 +3,7 @@
 #include "pch.h"
 #include <gl/GL.h>
 #include <gl/GLU.h>
-
+#include "OpenGLRenderer.h"
 
 enum ViewerStyle
 {
@@ -19,6 +19,8 @@ public:
 	~OpenGL();
 
 	bool init(HWND hWnd, ViewerStyle Style);
+	void initFont();
+	void InitLighting();
 	void Cleanuo();
 	void Setoffset(float x, float y);
 	void Setzoom(float z);
@@ -33,8 +35,15 @@ public:
 
 	void d_ChangeViewer(ViewerStyle Style);
 
-	const ViewerStyle GetCurrentStyle() { return m_style; };
+	void ScreenToGL(int screenX, int screenY, float& glX, float& glY);
 
+	bool ScreenToGL_3D(int screenX, int screenY, float& outX, float& outY, float& outZ);
+
+	const ViewerStyle GetCurrentStyle() { return m_style; }
+
+	void SetAddMode(bool enable) { m_isAddAtomMode = enable;    std::cout << "Add 모드 활성화" << "\n";
+	}
+	bool GetAddMode() {return m_isAddAtomMode;}
 private:
 	ViewerStyle m_style = Viewer3D;
 	HDC m_hDC = nullptr;
@@ -48,6 +57,8 @@ private:
 	float m_offsetX = 0.0f;
 	float m_offsetY = 0.0f;
 	float m_offsetZ = 0.0f;
+	bool m_isAddAtomMode = false; 
+	GLuint m_fontListBase = 0;
 
 };
 

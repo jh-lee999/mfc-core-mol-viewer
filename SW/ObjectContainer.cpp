@@ -18,10 +18,25 @@ static BondDirection GetOppositeDirection(BondDirection dir)
     }
 }
 
-// 원자 추가
-int ObjectContainer::AddMolecule(const std::string& name, ColorName color, double size, float x, float y, float z)
+BondDirection GetDirectionByIndex(int idx)
 {
-    Molcule mol;
+    static std::vector<BondDirection> directions = {
+        BondDirection::Up,
+        BondDirection::Down,
+        BondDirection::Left,
+        BondDirection::Right,
+        BondDirection::UpLeft,
+        BondDirection::UpRight,
+        BondDirection::DownLeft,
+        BondDirection::DownRight
+    };
+    return directions[idx % directions.size()];
+}
+
+// 원자 추가
+int ObjectContainer::AddAtomObject(const std::string& name, ColorName color, double size, float x, float y, float z)
+{
+    Atom mol;
     mol.mol_id = next_mol_id++;
     mol.name = name;
     mol.mol_color = color;
@@ -45,8 +60,8 @@ int ObjectContainer::AddBond(int from_id, int to_id, BondDirection direction, in
 
     bonds.push_back(bond);
 
-    Molcule* from = GetMolecule(from_id);
-    Molcule* to = GetMolecule(to_id);
+    Atom* from = GetAtomObject(from_id);
+    Atom* to = GetAtomObject(to_id);
     if (from) from->bonds[direction] = to_id;
     if (to) to->bonds[GetOppositeDirection(direction)] = from_id;
 
@@ -54,7 +69,7 @@ int ObjectContainer::AddBond(int from_id, int to_id, BondDirection direction, in
 }
 
 // 원자 조회 (비상수)
-Molcule* ObjectContainer::GetMolecule(int id)
+Atom* ObjectContainer::GetAtomObject(int id)
 {
     for (auto& m : molecules)
         if (m.mol_id == id) return &m;
@@ -62,21 +77,10 @@ Molcule* ObjectContainer::GetMolecule(int id)
 }
 
 // 원자 조회 (상수)
-const Molcule* ObjectContainer::GetMolecule(int id) const
+const Atom* ObjectContainer::GetAtomObject(int id) const
 {
     for (const auto& m : molecules)
         if (m.mol_id == id) return &m;
     return nullptr;
 }
 
-// 그리기 관련 함수
-void ObjectContainer::DrawAll()
-{
-    for (const auto& mol : molecules)
-    {
-    }
-
-    for (const auto& bond : bonds)
-    {
-    }
-}

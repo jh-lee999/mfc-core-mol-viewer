@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "MoleculeParser.h"
 
 enum class BondDirection {
     Up,
@@ -15,6 +16,8 @@ enum class BondDirection {
     DownRight
 };
 
+BondDirection GetDirectionByIndex(int idx);
+
 struct Bond {
     int from_id;
     int to_id;
@@ -22,7 +25,7 @@ struct Bond {
     int bond_order;
 };
 
-struct Molcule {
+struct Atom {
     int mol_id;
     std::string name;
     ColorName mol_color;
@@ -38,7 +41,7 @@ private:
     int next_mol_id = 1;
     int next_bond_id = 1;
 
-    std::vector<Molcule> molecules;
+    std::vector<Atom> molecules;
     std::vector<Bond> bonds;
 
     ObjectContainer() = default;
@@ -53,17 +56,16 @@ public:
     ObjectContainer(const ObjectContainer&) = delete;
     ObjectContainer& operator=(const ObjectContainer&) = delete;
 
-    int AddMolecule(const std::string& name, ColorName color, double size, float x, float y, float z);
+    int AddAtomObject(const std::string& name, ColorName color, double size, float x, float y, float z);
 
     int AddBond(int from_id, int to_id, BondDirection direction, int order = 1);
 
     // 조회
-    Molcule* GetMolecule(int id);
-    const Molcule* GetMolecule(int id) const;
+    Atom* GetAtomObject(int id);
+    const Atom* GetAtomObject(int id) const;
 
-    const std::vector<Molcule>& GetAllMolecules() const { return molecules; }
+    const std::vector<Atom>& GetAllMolecules() const { return molecules; }
     const std::vector<Bond>& GetAllBonds() const { return bonds; }
 
-    // OpenGL 렌더링용
-    void DrawAll();
+
 };

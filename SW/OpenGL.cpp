@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "OpenGL.h"
 
 #pragma comment(lib, "opengl32.lib")
@@ -17,43 +17,89 @@ bool OpenGL::init(HWND hWnd, ViewerStyle Style)
     m_hWnd = hWnd;
     m_hDC = ::GetDC(hWnd);
     
-    // DC¿¡ ¾î¶² ¹æ½ÄÀÇ ÇÈ¼¿ µ¥ÀÌÅÍ¸¦ »ç¿ëÇÒ °ÇÁö¿¡ ´ëÇØ Á¤ÀÇÇÏ´Â ±¸Á¶Ã¼
+    // DCì— ì–´ë–¤ ë°©ì‹ì˜ í”½ì…€ ë°ì´í„°ë¥¼ ì‚¬ìš©í•  ê±´ì§€ì— ëŒ€í•´ ì •ì˜í•˜ëŠ” êµ¬ì¡°ì²´
     PIXELFORMATDESCRIPTOR pfd =
     {
         sizeof(PIXELFORMATDESCRIPTOR),
         1,
-        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, //À©µµ¿ì¿¡ Á÷Á¢ ±×¸± ¼ö ÀÖÀ½, GL Áö¿ø, ´õºí ¹öÆÛ¸µ Áö¿ø
-        PFD_TYPE_RGBA, // »ö»ó Æ÷¸ä
-        32, //32ºñÆ® ÄÃ·¯ 
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, //ìœˆë„ìš°ì— ì§ì ‘ ê·¸ë¦´ ìˆ˜ ìˆìŒ, GL ì§€ì›, ë”ë¸” ë²„í¼ë§ ì§€ì›
+        PFD_TYPE_RGBA, // ìƒ‰ìƒ í¬ë©§
+        32, //32ë¹„íŠ¸ ì»¬ëŸ¬ 
         0, 0, 0, 0, 0, 0,
         0,
         0,
         0,
         0, 0, 0, 0,
-        24, // ±íÀÌ ¹öÆÛ ¿ë·®
-        8, // ½ºÅÙ½Ç ¹öÆÛ ¿ë·®
+        24, // ê¹Šì´ ë²„í¼ ìš©ëŸ‰
+        8, // ìŠ¤í…ì‹¤ ë²„í¼ ìš©ëŸ‰
         0,
         PFD_MAIN_PLANE,
         0,
         0, 0, 0
     };
-    // À§ÀÇ pfd¿¡¼­ Á¤ÇÑ °¡Àå ºñ½ÁÇÑ ÇÈ¼¿ Æ÷¸äÀ» Á¤ÇØ´Ş¶ó°í ¿äÃ»
+    // ìœ„ì˜ pfdì—ì„œ ì •í•œ ê°€ì¥ ë¹„ìŠ·í•œ í”½ì…€ í¬ë©§ì„ ì •í•´ë‹¬ë¼ê³  ìš”ì²­
     int pixelFormat = ChoosePixelFormat(m_hDC, &pfd);
     if (pixelFormat == 0) return false;
 
     if (m_style != Viewer2D && m_style != Viewer3D) return false;
      m_style = Style;
      Setzoom(-5.0f);
-    // À§¿¡¼­ Á¤ÇÑ ÇÈ¼¿°ªÀ» Á¤ÀÇÇÔ-> ÀÌ ½ÃÁ¡ºÎÅÍ DC´Â opengl dc°¡ µÊ.
+ 
+    // ìœ„ì—ì„œ ì •í•œ í”½ì…€ê°’ì„ ì •ì˜í•¨-> ì´ ì‹œì ë¶€í„° DCëŠ” opengl dcê°€ ë¨.
     if (!SetPixelFormat(m_hDC, pixelFormat, &pfd)) return false;
 
-    // HGLRC »ı¼º, OpenGLÀÇ »óÅÂ°ª, ½¦ÀÌ´õ, ¹öÅØ½º µ¥ÀÌÅÍ µî ÀúÀåÇÒ GL ÄÁÅØ½ºÆ®ÀÇ °ø°£
+    // HGLRC ìƒì„±, OpenGLì˜ ìƒíƒœê°’, ì‰ì´ë”, ë²„í…ìŠ¤ ë°ì´í„° ë“± ì €ì¥í•  GL ì»¨í…ìŠ¤íŠ¸ì˜ ê³µê°„
     m_hRC = wglCreateContext(m_hDC);
     if (!m_hRC) return false;
-    // ¸¸µç RC¸¦ DC¿¡ ¿¬°áÇÔ
-    return wglMakeCurrent(m_hDC, m_hRC) == TRUE;
+    // ë§Œë“  RCë¥¼ DCì— ì—°ê²°í•¨
 
+    if (!wglMakeCurrent(m_hDC, m_hRC)) return false;
+
+    // âœ… ì´ ë‹¤ìŒë¶€í„°ë§Œ OpenGL í•¨ìˆ˜ í˜¸ì¶œì´ ìœ íš¨í•¨
+    InitLighting();
+    initFont();
+
+    return true;
 }
+
+void OpenGL::initFont()
+{
+    HDC hdc = m_hDC;
+
+    HFONT hFont = CreateFont(
+        -14, 0, 0, 0, FW_NORMAL,
+        FALSE, FALSE, FALSE,
+        ANSI_CHARSET, OUT_TT_PRECIS,
+        CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE,
+        L"Consolas");
+
+    SelectObject(hdc, hFont);
+
+    m_fontListBase = glGenLists(256);
+    wglUseFontBitmaps(hdc, 0, 255, m_fontListBase);
+}
+
+
+void OpenGL::InitLighting()
+{
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);  // â† âœ… ê¼­ ìˆì–´ì•¼ í•˜ê³ 
+
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);  // â† âœ… ì´ê±° í•„ìˆ˜!!
+
+    GLfloat lightPos[] = { 0.0f, 0.0f, 5.0f, 1.0f };
+    GLfloat ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+}
+
+
 
 void OpenGL::Cleanuo()
 {
@@ -66,8 +112,8 @@ void OpenGL::Cleanuo()
 
     if (m_hDC)
     {
-        // HWND´Â ViewMain¿¡¼­ °ü¸®ÇÏ¹Ç·Î ReleaseDC¸¸
-        // ::ReleaseDC(hWnd, m_hDC); ¡ç hWnd µû·Î °ü¸® ¾ÈÇßÀ¸´Ï ¿ÜºÎ¿¡¼­ ÇØ¾ß ÇÔ
+        // HWNDëŠ” ViewMainì—ì„œ ê´€ë¦¬í•˜ë¯€ë¡œ ReleaseDCë§Œ
+        // ::ReleaseDC(hWnd, m_hDC); â† hWnd ë”°ë¡œ ê´€ë¦¬ ì•ˆí–ˆìœ¼ë‹ˆ ì™¸ë¶€ì—ì„œ í•´ì•¼ í•¨
         m_hDC = nullptr;
     }
 }
@@ -93,7 +139,7 @@ void OpenGL::Render()
 
     wglMakeCurrent(m_hDC, m_hRC);
 
-    // ÇöÀç ¿µ¿ª Å©±â È®ÀÎ
+    // í˜„ì¬ ì˜ì—­ í¬ê¸° í™•ì¸
     CRect rect;
     ::GetClientRect(m_hWnd, &rect);
     int width = rect.Width();
@@ -104,12 +150,12 @@ void OpenGL::Render()
 
     SetupProjection(width, height);
 
-    // ¸Å ÇÁ·¹ÀÓ ºäÆ÷Æ® ÀçÈ®ÀÎ
+    // ë§¤ í”„ë ˆì„ ë·°í¬íŠ¸ ì¬í™•ì¸
     glViewport(0, 0, width, height);
 
-    // ºä ¼¼ÆÃ
+    // ë·° ì„¸íŒ…
     SetupViewTransform();
-    // È­¸é Å¬¸®¾î
+    // í™”ë©´ í´ë¦¬ì–´
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -128,28 +174,16 @@ void OpenGL::SetRotation(float picth, float roll, float yaw)
 }
 
 
-void OpenGL::DrawObject() {
-
-
+void OpenGL::DrawObject() 
+{
     if (m_style == Viewer3D)
     {
-        // ±âÁ¸ 3D »ï°¢Çü
-        glBegin(GL_TRIANGLES);
-        glColor3f(1, 0, 0); glVertex3f(0.0f, 1.0f, 0.0f);
-        glColor3f(0, 1, 0); glVertex3f(-1.0f, -1.0f, 0.5f);
-        glColor3f(0, 0, 1); glVertex3f(1.0f, -1.0f, -0.5f);
-        glEnd();
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_LIGHTING);   
     }
-    else if (m_style == Viewer2D)
-    {
-        // 2D ±âÁØ »ï°¢Çü: À©µµ¿ì Å©±â ±âÁØ ÁÂÇ¥
-        glBegin(GL_TRIANGLES);
-        glColor3f(1, 0, 0); glVertex2f(100.0f, 100.0f);
-        glColor3f(0, 1, 0); glVertex2f(200.0f, 100.0f);
-        glColor3f(0, 0, 1); glVertex2f(150.0f, 200.0f);
-        glEnd();
-    }
-
+   OpenGLRenderer renderer;
+   renderer.SetFontListBase(m_fontListBase);
+   renderer.Draw(ObjectContainer::Get(),Getzoom());
 }
 
 void OpenGL::SetupProjection(int width, int height)
@@ -195,20 +229,22 @@ void OpenGL::SetupViewTransform()
         glRotatef(m_yaw, 0, 1, 0);
         glRotatef(m_roll, 0, 0, 1);
         glEnable(GL_DEPTH_TEST);
+       
     }
     else
     {
         glDisable(GL_DEPTH_TEST);
         glTranslatef(m_offsetX, m_offsetY, 0.0f);
     }
-
+    GLfloat lightPos[] = { 0.0f, 0.0f, 5.0f, 1.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 }
 
 void OpenGL::d_ChangeViewer(ViewerStyle Style)
 {
     m_style = Style;
 
-    // °øÅë ÃÊ±âÈ­
+    // ê³µí†µ ì´ˆê¸°í™”
     m_offsetX = 0.0f;
     m_offsetY = 0.0f;
     m_offsetZ = 0.0f;
@@ -216,20 +252,92 @@ void OpenGL::d_ChangeViewer(ViewerStyle Style)
     m_yaw = 0.0f;
     m_roll = 0.0f;
 
-    // ½ºÅ¸ÀÏº° ±âº» ÁÜ °Å¸® ¼³Á¤
+    // ìŠ¤íƒ€ì¼ë³„ ê¸°ë³¸ ì¤Œ ê±°ë¦¬ ì„¤ì •
     if (m_style == Viewer3D)
     {
-        m_offsetZ = -5.0f;  // 3D Ä«¸Ş¶ó ±âº» °Å¸®
+        m_offsetZ = -5.0f;  // 3D ì¹´ë©”ë¼ ê¸°ë³¸ ê±°ë¦¬
     }
     else if (m_style == Viewer2D)
     {
-        m_offsetZ = 0.0f;   // 2D¿¡¼­´Â Zoom ºñÀ²·Î »ç¿ë
+        m_offsetZ = 0.0f;   // 2Dì—ì„œëŠ” Zoom ë¹„ìœ¨ë¡œ ì‚¬ìš©
     }
 
-    // Åõ¿µ °»½Å + ·»´õ¸µ
+    // íˆ¬ì˜ ê°±ì‹  + ë Œë”ë§
     CRect rect;
     ::GetClientRect(m_hWnd, &rect);
     SetupProjection(rect.Width(), rect.Height());
     Render();
 }
 
+void OpenGL::ScreenToGL(int screenX, int screenY, float& glX, float& glY)
+{
+    RECT rect;
+    ::GetClientRect(m_hWnd, &rect);
+    int width = rect.right - rect.left;
+    int height = rect.bottom - rect.top;
+
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ;
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    winX = (float)screenX;
+    winY = (float)(viewport[3] - screenY);
+
+    glReadPixels(screenX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);  
+
+    if (gluUnProject(winX, winY, 0.5f, modelview, projection, viewport, &posX, &posY, &posZ))
+    {
+        glX = static_cast<float>(posX);
+        glY = static_cast<float>(posY);
+    }
+    else
+    {
+        glX = glY = 0.0f;
+    }
+}
+
+bool OpenGL::ScreenToGL_3D(int screenX, int screenY, float& outX, float& outY, float& outZ)
+{
+    GLint viewport[4];
+    GLdouble modelview[16], projection[16];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+
+    // í™”ë©´ ê¸°ì¤€ ë§ˆìš°ìŠ¤ ì¢Œí‘œ
+    GLfloat winX = static_cast<GLfloat>(screenX);
+    GLfloat winY = static_cast<GLfloat>(viewport[3] - screenY);  // Y ë°˜ì „
+
+    // ì‹œì‘ì  (Near)
+    GLdouble startX, startY, startZ;
+    if (!gluUnProject(winX, winY, 0.0, modelview, projection, viewport, &startX, &startY, &startZ)) return false;
+
+    // ëì  (Far)
+    GLdouble endX, endY, endZ;
+    if (!gluUnProject(winX, winY, 1.0, modelview, projection, viewport, &endX, &endY, &endZ)) return false;
+
+    // ì›í•˜ëŠ” Z ìœ„ì¹˜ (ì˜ˆ: ê³ ì •ëœ ì›”ë“œ ì¢Œí‘œ z = -5.0f ê¸°ì¤€ í‰ë©´)
+    float targetZ = -5.0f;
+
+    // ë°©í–¥ ë²¡í„°
+    float dirX = static_cast<float>(endX - startX);
+    float dirY = static_cast<float>(endY - startY);
+    float dirZ = static_cast<float>(endZ - startZ);
+
+    if (fabs(dirZ) < 1e-6f) return false;  // zì¶• í‰í–‰ì´ë©´ ë¬´ì‹œ
+
+    // t: start â†’ end ì‚¬ì´ì—ì„œ z = targetZì— ë„ë‹¬í•˜ëŠ” ë¹„ìœ¨
+    float t = (targetZ - static_cast<float>(startZ)) / dirZ;
+
+    outX = static_cast<float>(startX) + dirX * t;
+    outY = static_cast<float>(startY) + dirY * t;
+    outZ = targetZ;
+
+    return true;
+}

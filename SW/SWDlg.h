@@ -47,6 +47,7 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	void ToggleFullscreen();
 	bool m_bIsFullscreen = false;
+	ViewMain* GetMVInstance() { return view_main; };
 };
 
 extern CSWDlg* g_program;

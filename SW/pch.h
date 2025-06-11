@@ -9,7 +9,10 @@
 
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
+#include <iostream>
 
+#define WM_USER_ADD_ATOM_MODE (WM_USER + 100) // 데이터 추가 모드 관련 메세지
+#define WM_LOAD_MOLECULE_FILE (WM_USER + 101)
 
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif //PCH_H

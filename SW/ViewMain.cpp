@@ -6,7 +6,7 @@
 #include "afxdialogex.h"
 #include "SWDlg.h"
 #include "ViewMain.h"
-
+#include "MoleculeParser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -62,8 +62,29 @@ BEGIN_MESSAGE_MAP(ViewMain, StyleDialog)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 	ON_WM_MOUSEWHEEL()
+	ON_MESSAGE(WM_USER_ADD_ATOM_MODE, &ViewMain::OnUpdateAtomAdd)
+	ON_MESSAGE(WM_LOAD_MOLECULE_FILE, &ViewMain::OnLoadMolculeData)
 END_MESSAGE_MAP()
 
+
+LRESULT ViewMain::OnUpdateAtomAdd(WPARAM wParam, LPARAM lParam)
+{
+	bool isEnabled = (wParam != 0);  // 1 → true, 0 → false
+	m_gl.SetAddMode(isEnabled);
+	return 0;
+}
+LRESULT ViewMain::OnLoadMolculeData(WPARAM wParam, LPARAM lParam)
+{
+	std::wstring* pStr = reinterpret_cast<std::wstring*>(lParam);
+	if (pStr)
+	{
+		std::string path(pStr->begin(), pStr->end());
+		delete pStr;
+
+		MoleculeParser::LoadFromFile(path);
+		Invalidate();  // 혹시 화면 갱신 필요시
+	}
+}
 
 void ViewMain::OnBnClickedButton1()
 {
@@ -91,6 +112,27 @@ void ViewMain::OnTimer(UINT_PTR nIDEvent)
 
 void ViewMain::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	if (m_gl.GetAddMode())
+	{
+		float glX = 0.0f, glY = 0.0f, glZ = -5.0f;
+
+		if (m_gl.GetCurrentStyle() == Viewer2D) {
+			m_gl.ScreenToGL(point.x, point.y, glX, glY);
+			glZ = 0.0f;  // 2D는 z 고정
+		}
+		else if (m_gl.GetCurrentStyle() == Viewer3D) {
+			if (!m_gl.ScreenToGL_3D(point.x, point.y, glX, glY, glZ))
+			{
+				glX = glY = 0.0f;
+				glZ = -5.0f;
+			}
+		}
+
+		ObjectContainer::Get().AddAtomObject("C", ColorName::White, 1.0, glX, glY, glZ);
+		m_gl.Render();
+		return;
+	}
+
 	m_mouseCtrl.StartDrag(point);
 	SetCapture();
 	StyleDialog::OnLButtonDown(nFlags, point);

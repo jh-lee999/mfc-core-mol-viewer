@@ -36,4 +36,6 @@ public:
 
 	virtual BOOL OnInitDialog();	
 
+	afx_msg void OnBnClickedAddatom();
+	afx_msg void OnBnClickedBtnDataTest();
 };

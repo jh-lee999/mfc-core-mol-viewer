@@ -87,6 +87,12 @@
     <ClInclude Include="Colors.h">
       <Filter>OpenGL\Singleton</Filter>
     </ClInclude>
+    <ClInclude Include="OpenGLRenderer.h">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="MoleculeParser.h">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SW.cpp">
@@ -126,6 +132,15 @@
       <Filter>OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="ObjectContainer.cpp">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLRenderer.cpp">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="Colors.cpp">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="MoleculeParser.cpp">
       <Filter>OpenGL\Singleton</Filter>
     </ClCompile>
   </ItemGroup>

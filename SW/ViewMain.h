@@ -33,7 +33,10 @@ public:
 
 	CStatic m_pictureCtl;
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnBnClickedButton1();
+	afx_msg
+		LRESULT OnUpdateAtomAdd(WPARAM wParam, LPARAM lParam);
+	LRESULT OnLoadMolculeData(WPARAM wParam, LPARAM lParam);
+	void OnBnClickedButton1();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);

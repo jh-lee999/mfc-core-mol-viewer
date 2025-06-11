@@ -20,14 +20,14 @@ void OpenGLMouseController::UpdateDrag(UINT nFlags, CPoint pt, ViewerStyle style
     float dy = static_cast<float>(pt.y - m_lastMouse.y);
 
     float zoom = gl.Getzoom();  
-    float scale = (style == Viewer3D) ? fabs(zoom) * 0.001f : 1.0f;
-    float rotateScale = max(0.5f, fabs(zoom) * 0.2f);
+    float scale = (style == Viewer3D) ? fabs(zoom) * 0.002f : 1.0f;
+    float rotateScale = max(0.5f, fabs(zoom) * 0.02f);
     if (nFlags & MK_LBUTTON)
     {
         if (style == Viewer3D)
         {
-            m_yaw += dx * rotateScale;
-            m_pitch += dy * rotateScale;
+            m_yaw += -dx * rotateScale;     // 수평 회전은 유지
+            m_pitch += +dy * rotateScale;
         }
     }
     else if (nFlags & MK_RBUTTON)

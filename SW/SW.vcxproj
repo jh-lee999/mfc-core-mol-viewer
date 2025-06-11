@@ -167,6 +167,7 @@
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>C:\opencv\build\include;C:\opencv\build\include\opencv2;$(SolutionDir)CustomControl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -194,6 +195,7 @@
     <ClInclude Include="DlgInquiryLog.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="MoleculeParser.h" />
     <ClInclude Include="OpenGL.h" />
     <ClInclude Include="OpenGLMouseController.h" />
     <ClInclude Include="pch.h" />
@@ -208,10 +210,13 @@
     <ClInclude Include="VersionDef.h" />
     <ClInclude Include="ViewMain.h" />
     <ClInclude Include="ObjectContainer.h" />
+    <ClInclude Include="OpenGLRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Colors.cpp" />
     <ClCompile Include="DlgInquiryLog.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="MoleculeParser.cpp" />
     <ClCompile Include="ObjectContainer.cpp" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="OpenGLMouseController.cpp" />
@@ -228,6 +233,7 @@
     <ClCompile Include="SW.cpp" />
     <ClCompile Include="SWDlg.cpp" />
     <ClCompile Include="ViewMain.cpp" />
+    <ClCompile Include="OpenGLRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SW.rc" />
