@@ -94,7 +94,6 @@ void ViewProgramTopMenu::OnBnClickedBtnDataTest()
 
 		if (::IsWindow(hMainWnd))
 		{
-			// CString → std::wstring → LPWSTR
 			std::wstring* pStr = new std::wstring(path.GetString());
 			::PostMessage(hMainWnd, WM_LOAD_MOLECULE_FILE, 0, reinterpret_cast<LPARAM>(pStr));
 		}

@@ -25,7 +25,7 @@ bool MoleculeParser::LoadFromFile(const std::string& filename)
         BondDirection::DownRight
     };
 
-    int directionIndex = 0;  // bond 방향 순환용
+    int directionIndex = 0;  
 
     while (std::getline(file, line)) {
         if (line.empty()) {
@@ -40,7 +40,6 @@ bool MoleculeParser::LoadFromFile(const std::string& filename)
             std::string name;
             iss >> x >> y >> z >> name;
 
-            // 색상 자동 지정
             ColorName color = (name == "C") ? ColorName::Gray :
                 (name == "O") ? ColorName::Red :
                 (name == "H") ? ColorName::White : ColorName::White;
@@ -59,7 +58,7 @@ bool MoleculeParser::LoadFromFile(const std::string& filename)
             int from_id = mol_ids[fromIdx - 1];
             int to_id = mol_ids[toIdx - 1];
 
-            // 방향 자동 할당 (순환)
+   
             BondDirection dir = directions[directionIndex++ % directions.size()];
 
             ObjectContainer::Get().AddBond(from_id, to_id, dir, order);
