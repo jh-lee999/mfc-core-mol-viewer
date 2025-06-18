@@ -35,7 +35,7 @@ void ViewProgramTopMenu::UpdateLayerControl(int cx, int cy)
 BOOL ViewProgramTopMenu::OnInitDialog()
 {
 	StyleDialog::OnInitDialog();
-	SetBackgroundColor(RGB(230, 230, 230));  // 배경 색상 
+	SetBackgroundColor(RGB(240, 240, 240));  // 배경 색상 
 	
 	COLORREF activateColor = RGB(64, 64, 64); // 버튼 색상 지정
 

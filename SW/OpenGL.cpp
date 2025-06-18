@@ -156,12 +156,14 @@ void OpenGL::Render()
     // 뷰 세팅
     SetupViewTransform();
     // 화면 클리어
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    
 
     DrawObject();
 
-
+    DrawWorldAxisIndicator(width, height);
     SwapBuffers(m_hDC);
 }
 
@@ -217,28 +219,147 @@ void OpenGL::SetupProjection(int width, int height)
 
 
 
-void OpenGL::SetupViewTransform() 
+void OpenGL::SetupViewTransform()
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     if (m_style == Viewer3D)
     {
-        glTranslatef(m_offsetX, m_offsetY, m_offsetZ);
-        glRotatef(m_pitch, 1, 0, 0);
-        glRotatef(m_yaw, 0, 1, 0);
-        glRotatef(m_roll, 0, 0, 1);
+        // 타겟 위치 (중심)
+        float targetX = m_offsetX;
+        float targetY = m_offsetY;
+        float targetZ = 0.0f;
+
+        float distance = -m_offsetZ;  // distance는 양수화
+
+        // 각도 → 라디안
+        float pitchRad = m_pitch * 3.1415926f / 180.0f;
+        float yawRad = m_yaw * 3.1415926f / 180.0f;
+
+
+        // ✅ 정확한 카메라 위치 (구면 좌표계 기준)
+        float camX = targetX + distance * cosf(pitchRad) * sinf(yawRad);
+        float camY = targetY + distance * sinf(pitchRad);
+        float camZ = targetZ + distance * cosf(pitchRad) * cosf(yawRad);
+
+
+
+        // ✅ gluLookAt (카메라 → 타겟)
+        gluLookAt(camX, camY, camZ,
+            targetX, targetY, targetZ,
+            0.0f, 1.0f, 0.0f);
+
         glEnable(GL_DEPTH_TEST);
-       
     }
     else
     {
         glDisable(GL_DEPTH_TEST);
         glTranslatef(m_offsetX, m_offsetY, 0.0f);
     }
+
     GLfloat lightPos[] = { 0.0f, 0.0f, 5.0f, 1.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 }
+
+void OpenGL::DrawWorldAxisIndicator(int screenWidth, int screenHeight)
+{
+    const int viewportSize = 80;
+    const int margin = 10;
+    const int viewportX = screenWidth - viewportSize - margin;
+    const int viewportY = margin;
+
+    m_axisViewport = CRect(viewportX, viewportY, viewportX + viewportSize, viewportY + viewportSize);
+
+    glViewport(viewportX, viewportY, viewportSize, viewportSize);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, 1.0, 0.1, 10.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glTranslatef(0.0f, 0.0f, -3.0f);
+    glRotatef(m_pitch, 1, 0, 0);
+    glRotatef(m_yaw, 0, 1, 0);
+    glRotatef(m_roll, 0, 0, 1);
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(2.5f);
+
+    glBegin(GL_LINES);
+    glColor3f(1, 0, 0); glVertex3f(0, 0, 0); glVertex3f(1, 0, 0);
+    glColor3f(0, 1, 0); glVertex3f(0, 0, 0); glVertex3f(0, 1, 0);
+    glColor3f(0, 0, 1); glVertex3f(0, 0, 0); glVertex3f(0, 0, 1);
+    glEnd();
+
+    glLineWidth(1.0f);
+
+    // 🟡 중심 정육면체는 hover일 때만 그린다
+    if (m_axisHovered)
+    {
+        glColor3f(1.0f, 1.0f, 0.2f); // 강조 색
+        float s = 0.1f;
+
+        glBegin(GL_QUADS);
+        // 6면 그리기
+        glVertex3f(s, -s, -s); glVertex3f(s, -s, s); glVertex3f(s, s, s); glVertex3f(s, s, -s);
+        glVertex3f(-s, -s, -s); glVertex3f(-s, s, -s); glVertex3f(-s, s, s); glVertex3f(-s, -s, s);
+        glVertex3f(-s, s, -s); glVertex3f(s, s, -s); glVertex3f(s, s, s); glVertex3f(-s, s, s);
+        glVertex3f(-s, -s, -s); glVertex3f(-s, -s, s); glVertex3f(s, -s, s); glVertex3f(s, -s, -s);
+        glVertex3f(-s, -s, s); glVertex3f(-s, s, s); glVertex3f(s, s, s); glVertex3f(s, -s, s);
+        glVertex3f(-s, -s, -s); glVertex3f(s, -s, -s); glVertex3f(s, s, -s); glVertex3f(-s, s, -s);
+        glEnd();
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+}
+
+
+void OpenGL::DrawSolidCube() {
+
+    float s = 0.1f;  // 큐브 한 변의 절반
+
+    glBegin(GL_QUADS);
+
+    glVertex3f(s, -s, -s);
+    glVertex3f(s, -s, s);
+    glVertex3f(s, s, s);
+    glVertex3f(s, s, -s);
+
+    glVertex3f(-s, -s, -s);
+    glVertex3f(-s, s, -s);
+    glVertex3f(-s, s, s);
+    glVertex3f(-s, -s, s);
+
+    glVertex3f(-s, s, -s);
+    glVertex3f(s, s, -s);
+    glVertex3f(s, s, s);
+    glVertex3f(-s, s, s);
+
+    glVertex3f(-s, -s, -s);
+    glVertex3f(-s, -s, s);
+    glVertex3f(s, -s, s);
+    glVertex3f(s, -s, -s);
+
+    glVertex3f(-s, -s, s);
+    glVertex3f(-s, s, s);
+    glVertex3f(s, s, s);
+    glVertex3f(s, -s, s);
+
+    glVertex3f(-s, -s, -s);
+    glVertex3f(s, -s, -s);
+    glVertex3f(s, s, -s);
+    glVertex3f(-s, s, -s);
+
+    glEnd();
+
+
+}
+
 
 void OpenGL::d_ChangeViewer(ViewerStyle Style)
 {
@@ -340,4 +461,40 @@ bool OpenGL::ScreenToGL_3D(int screenX, int screenY, float& outX, float& outY, f
     outZ = targetZ;
 
     return true;
+}
+
+
+
+void OpenGL::HandleMouseMove(int mouseX, int mouseY)
+{
+    // Y축 반전 필요할 수 있음 (MFC는 안 해도 됨)
+    m_axisHovered = m_axisViewport.PtInRect(CPoint(mouseX, mouseY));
+}
+
+void OpenGL::HandleMouseClick(int mouseX, int mouseY)
+{
+    if (m_axisHovered)
+    {
+        int cx = m_axisViewport.left + m_axisViewport.Width() / 2;
+        int cy = m_axisViewport.top + m_axisViewport.Height() / 2;
+
+        if (abs(mouseX - cx) < 10 && abs(mouseY - cy) < 10)
+        {
+            ResetViewPoint();
+            Render();
+        }
+    }
+}
+
+void OpenGL::ResetViewPoint() {
+
+    float m_pitch = 0.0f;
+    float m_yaw = 0.0f;
+    float m_roll = 0.0f;
+
+    float m_offsetX = 0.0f;
+    float m_offsetY = 0.0f;
+    float m_offsetZ = 0.0f;
+
+
 }

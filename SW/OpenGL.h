@@ -33,11 +33,21 @@ public:
 	void SetupProjection(int width, int height);
 	void SetupViewTransform();
 
+	void DrawWorldAxisIndicator(int screenWidth, int screenHeight);
+
+	void DrawSolidCube();
+
 	void d_ChangeViewer(ViewerStyle Style);
 
 	void ScreenToGL(int screenX, int screenY, float& glX, float& glY);
 
 	bool ScreenToGL_3D(int screenX, int screenY, float& outX, float& outY, float& outZ);
+
+	void HandleMouseMove(int mouseX, int mouseY);
+
+	void HandleMouseClick(int mouseX, int mouseY);
+
+	void ResetViewPoint();
 
 	const ViewerStyle GetCurrentStyle() { return m_style; }
 
@@ -59,6 +69,7 @@ private:
 	float m_offsetZ = 0.0f;
 	bool m_isAddAtomMode = false; 
 	GLuint m_fontListBase = 0;
-
+	CRect m_axisViewport;     
+	bool m_axisHovered = false;
 };
 

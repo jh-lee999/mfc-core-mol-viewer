@@ -211,6 +211,7 @@
     <ClInclude Include="ViewMain.h" />
     <ClInclude Include="ObjectContainer.h" />
     <ClInclude Include="OpenGLRenderer.h" />
+    <ClInclude Include="MoleculeStructure.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Colors.cpp" />
@@ -245,6 +246,7 @@
     <Image Include="res\DrillingMachine.ico" />
     <Image Include="res\Exit.ico" />
     <Image Include="res\SW.ico" />
+    <Image Include="res\Title.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Base\Base.vcxproj">

@@ -98,7 +98,10 @@ BOOL CSWDlg::OnInitDialog()
 	//MoveWindow(Utility::GetMonitorRegion(0)); // 화면 크기 조절
 
 	// 시스템 메뉴에 "정보..." 메뉴 항목을 추가합니다.
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_TITLE);
 	
+	SetWindowTextW(_T("Molecule Viewer SW"));
+
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 

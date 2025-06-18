@@ -27,7 +27,7 @@ ViewMain::~ViewMain()
 
 void ViewMain::UpdateLayerControl(int cx, int cy)
 {
-	m_pictureCtl.MoveWindow(5, 5, cy  - 10, cy  - 10);
+	m_pictureCtl.MoveWindow(10, 10, cx-20, cy  - 20);
 
 }
 
@@ -132,7 +132,7 @@ void ViewMain::OnLButtonDown(UINT nFlags, CPoint point)
 		m_gl.Render();
 		return;
 	}
-
+	m_gl.HandleMouseClick(point.x, point.y);
 	m_mouseCtrl.StartDrag(point);
 	SetCapture();
 	StyleDialog::OnLButtonDown(nFlags, point);
@@ -166,7 +166,7 @@ void ViewMain::OnRButtonDown(UINT nFlags, CPoint point)
 void ViewMain::OnMouseMove(UINT nFlags, CPoint point)
 {
 	m_mouseCtrl.UpdateDrag(nFlags, point, m_gl.GetCurrentStyle(), m_gl);
-
+	m_gl.HandleMouseMove(point.x, point.y);
 	StyleDialog::OnMouseMove(nFlags, point);
 }
 
@@ -175,22 +175,29 @@ void ViewMain::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL ViewMain::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	// 마우스 커서 위치 얻기
 	POINT cursorPos;
 	::GetCursorPos(&cursorPos);
 
-	// OpenGL Static 컨트롤의 위치 얻기
 	CRect rect;
 	GetDlgItem(IDC_STATIC_OPENCV)->GetWindowRect(&rect);
 
-	// 커서가 OpenGL 컨트롤 위에 있을 때만 처리
 	if (rect.PtInRect(cursorPos))
 	{
-		float zoom = (zDelta > 0) ? 0.5f : -0.5f;
-		m_gl.Setzoom(m_gl.Getzoom() + zoom);  // GetZoom()은 m_offsetZ 리턴
+		ScreenToClient(&cursorPos);
+		float glX = 0, glY = 0;
+		m_gl.ScreenToGL(cursorPos.x, cursorPos.y, glX, glY);
+
+		float prevZoom = m_gl.Getzoom();
+		float newZoom = prevZoom + ((zDelta > 0) ? 0.5f : -0.5f);
+		m_gl.Setzoom(newZoom);
+
+		float deltaZoom = newZoom - prevZoom;
+		m_mouseCtrl.m_offsetX -= glX * deltaZoom * 0.1f;
+		m_mouseCtrl.m_offsetY -= glY * deltaZoom * 0.1f;
+
+		m_gl.Setoffset(m_mouseCtrl.m_offsetX, m_mouseCtrl.m_offsetY);
 		m_gl.Render();
 	}
 
 	return StyleDialog::OnMouseWheel(nFlags, zDelta, pt);
 }
-

@@ -7,11 +7,11 @@
 #define IDD_SW_DIALOG                   102
 #define IDD_VIEW_MAIN                   130
 #define IDD_VIEW_PROGRAM_TOP_MENU       132
-#define IDI_EXIT                        134
 #define IDR_MAINFRAME                   135
 #define IDD_VIEW_PROGRAM_LOG            138
 #define IDD_INQUIRY_LOG                 140
 #define IDD_MODALESS_MENU1              142
+#define IDI_TITLE                       144
 #define IDC_BTN_CLOSE                   1003
 #define IDC_TAB_LOG                     1006
 #define IDC_DATE_START                  1009
@@ -30,7 +30,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        144
+#define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           101

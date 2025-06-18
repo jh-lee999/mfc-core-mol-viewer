@@ -93,6 +93,9 @@
     <ClInclude Include="MoleculeParser.h">
       <Filter>OpenGL\Singleton</Filter>
     </ClInclude>
+    <ClInclude Include="MoleculeStructure.h">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SW.cpp">
@@ -162,6 +165,9 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\DrillingMachine.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Title.ico">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
