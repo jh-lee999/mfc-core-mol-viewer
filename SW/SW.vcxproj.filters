@@ -96,6 +96,9 @@
     <ClInclude Include="MoleculeStructure.h">
       <Filter>OpenGL\Singleton</Filter>
     </ClInclude>
+    <ClInclude Include="mStructure.h">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SW.cpp">
@@ -144,6 +147,9 @@
       <Filter>OpenGL\Singleton</Filter>
     </ClCompile>
     <ClCompile Include="MoleculeParser.cpp">
+      <Filter>OpenGL\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="mStructure.cpp">
       <Filter>OpenGL\Singleton</Filter>
     </ClCompile>
   </ItemGroup>

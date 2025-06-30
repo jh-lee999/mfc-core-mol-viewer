@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+
 enum class ColorName {
     Red,
     Green,
@@ -9,10 +10,19 @@ enum class ColorName {
     Magenta,
     White,
     Black,
-    Gray
+    Gray,
+    Orange,
+    Pink,
+    Brown,
+    Purple,
+    Teal,
+    Olive,
+    Navy,
+    Silver,
+    Gold
 };
 
 struct ColorRGB { float r, g, b; };
 
 ColorRGB GetColor(ColorName name);
-
+ColorName StringToColorName(const std::string& name);

@@ -34,13 +34,19 @@ BondDirection GetDirectionByIndex(int idx)
 }
 
 // 원자 추가
-int ObjectContainer::AddAtomObject(const std::string& name, ColorName color, double size, float x, float y, float z)
+int ObjectContainer::AddAtomObject(const std::string& symbol, float x, float y, float z)
 {
+    const AtomData* atomInfo = g_molDB.GetAtomData(symbol);
+    if (!atomInfo) {
+        AfxMessageBox(CString("알 수 없는 원소: ") + CString(symbol.c_str()));
+        return -1;
+    }
+
     Atom mol;
     mol.mol_id = next_mol_id++;
-    mol.name = name;
-    mol.mol_color = color;
-    mol.mol_size = size;
+    mol.name = symbol;
+    mol.mol_color = atomInfo->color;
+    mol.mol_size = atomInfo->radius;
     mol.x = x;
     mol.y = y;
     mol.z = z;

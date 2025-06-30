@@ -196,6 +196,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MoleculeParser.h" />
+    <ClInclude Include="mStructure.h" />
     <ClInclude Include="OpenGL.h" />
     <ClInclude Include="OpenGLMouseController.h" />
     <ClInclude Include="pch.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="DlgInquiryLog.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MoleculeParser.cpp" />
+    <ClCompile Include="mStructure.cpp" />
     <ClCompile Include="ObjectContainer.cpp" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="OpenGLMouseController.cpp" />

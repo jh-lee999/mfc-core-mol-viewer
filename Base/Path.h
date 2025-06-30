@@ -8,4 +8,5 @@ public:
 	static LPCTSTR GetSystemFolderPath();
 	static LPCTSTR GetLogFolderPath();
 	static LPCTSTR GetSystemFilePath();
+	static LPCTSTR GetDbFilePath();
 };

@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include "MoleculeParser.h"
+#include "mStructure.h"
 
 enum class BondDirection {
     Up,
@@ -56,7 +57,8 @@ public:
     ObjectContainer(const ObjectContainer&) = delete;
     ObjectContainer& operator=(const ObjectContainer&) = delete;
 
-    int AddAtomObject(const std::string& name, ColorName color, double size, float x, float y, float z);
+
+    int AddAtomObject(const std::string& symbol, float x, float y, float z);
 
     int AddBond(int from_id, int to_id, BondDirection direction, int order = 1);
 

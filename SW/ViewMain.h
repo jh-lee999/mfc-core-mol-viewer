@@ -56,4 +56,5 @@ public:
 	float m_offsetY = 0.0f;
 
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	void initDB();
 };
