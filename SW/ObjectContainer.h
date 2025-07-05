@@ -60,6 +60,8 @@ public:
 
     int AddAtomObject(const std::string& symbol, float x, float y, float z);
 
+    int AddAtomObject(const std::string& name, float x, float y, float z, ColorName color);
+
     int AddBond(int from_id, int to_id, BondDirection direction, int order = 1);
 
     // Á¶È¸

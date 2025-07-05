@@ -40,10 +40,6 @@ bool MoleculeParser::LoadFromFile(const std::string& filename)
         std::string name;
         iss >> x >> y >> z >> name;
 
-        ColorName color = (name == "C") ? ColorName::Gray :
-            (name == "O") ? ColorName::Red :
-            (name == "H") ? ColorName::White : ColorName::White;
-
         int id = ObjectContainer::Get().AddAtomObject(name, x, y, z);
         mol_ids.push_back(id);
     }
