@@ -5,6 +5,7 @@
 #include <map>
 #include "MoleculeParser.h"
 #include "mStructure.h"
+#include <algorithm>
 
 enum class BondDirection {
     Up,
@@ -60,11 +61,17 @@ public:
 
     int AddAtomObject(const std::string& symbol, float x, float y, float z);
 
+    int AddAtomObject(const std::string& name, float x, float y, float z, ColorName color);
+
     int AddBond(int from_id, int to_id, BondDirection direction, int order = 1);
 
     // Á¶È¸
     Atom* GetAtomObject(int id);
     const Atom* GetAtomObject(int id) const;
+
+    int FindAtom(const std::string& name, float x, float y, float z);
+
+    bool ComputeCenterAndSize(float& outX, float& outY, float& outZ, float& outSize);
 
     const std::vector<Atom>& GetAllMolecules() const { return molecules; }
     const std::vector<Bond>& GetAllBonds() const { return bonds; }

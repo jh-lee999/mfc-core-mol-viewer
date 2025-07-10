@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "ObjectContainer.h"
 
+#undef min
+#undef max
+
 // 반대 방향 계산
 static BondDirection GetOppositeDirection(BondDirection dir)
 {
@@ -90,3 +93,46 @@ const Atom* ObjectContainer::GetAtomObject(int id) const
     return nullptr;
 }
 
+int ObjectContainer::FindAtom(const std::string& name, float x, float y, float z) {
+    for (const auto& atom : molecules) {
+        if (atom.name == name &&
+            fabs(atom.x - x) < 1e-4 &&
+            fabs(atom.y - y) < 1e-4 &&
+            fabs(atom.z - z) < 1e-4)
+        {
+            return atom.mol_id; 
+        }
+    }
+    return -1; 
+}
+
+
+bool ObjectContainer::ComputeCenterAndSize(float& outX, float& outY, float& outZ, float& outSize)
+{
+    const auto& atoms = GetAllMolecules();
+    if (atoms.empty()) return false;
+
+    float minX = FLT_MAX, minY = FLT_MAX, minZ = FLT_MAX;
+    float maxX = -FLT_MAX, maxY = -FLT_MAX, maxZ = -FLT_MAX;
+
+    for (const auto& atom : atoms) {
+        minX = std::min(minX, atom.x);
+        minY = std::min(minY, atom.y);
+        minZ = std::min(minZ, atom.z);
+        maxX = std::max(maxX, atom.x);
+        maxY = std::max(maxY, atom.y);
+        maxZ = std::max(maxZ, atom.z);
+    }
+
+    outX = (minX + maxX) / 2.0f;
+    outY = (minY + maxY) / 2.0f;
+    outZ = (minZ + maxZ) / 2.0f;
+
+    float sizeX = maxX - minX;
+    float sizeY = maxY - minY;
+    float sizeZ = maxZ - minZ;
+
+    outSize = std::max({ sizeX, sizeY, sizeZ });
+
+    return true;
+}

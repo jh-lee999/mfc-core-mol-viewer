@@ -96,6 +96,32 @@ void OpenGLRenderer::DrawBond(const Bond& bond, float zoom)
     glPopMatrix();
 }
 
+void OpenGLRenderer::CenterView()
+{
+    BoundingBox box = ComputeBoundingBox();
+
+    float centerX = (box.minX + box.maxX) / 2.0f;
+    float centerY = (box.minY + box.maxY) / 2.0f;
+    float centerZ = (box.minZ + box.maxZ) / 2.0f;
+
+    float sizeX = box.maxX - box.minX;
+    float sizeY = box.maxY - box.minY;
+    float sizeZ = box.maxZ - box.minZ;
+    float maxSize = std::max({ sizeX, sizeY, sizeZ });
+
+    // 카메라를 Z축 뒤로 뺀다 (원자 전체가 보이도록)
+    float cameraDistance = maxSize * 2.5f;
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    gluLookAt(
+        centerX, centerY, centerZ + cameraDistance,  // eye
+        centerX, centerY, centerZ,                  // center
+        0.0f, 1.0f, 0.0f                            // up
+    );
+}
+
 
 void OpenGLRenderer::DrawText3D(const std::string& text, float x, float y, float z)
 {

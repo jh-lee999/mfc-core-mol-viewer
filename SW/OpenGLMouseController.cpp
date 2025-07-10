@@ -22,7 +22,7 @@ void OpenGLMouseController::UpdateDrag(UINT nFlags, CPoint pt, ViewerStyle style
 
     float zoom = gl.Getzoom();
     float scale = (style == Viewer3D) ? fabs(zoom) * 0.002f : 1.0f;
-    float rotateScale = max(0.5f, fabs(zoom) * 0.02f);
+    float rotateScale = std::max(0.5f, fabs(zoom) * 0.02f);
 
     if (nFlags & MK_LBUTTON)
     {

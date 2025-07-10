@@ -162,8 +162,10 @@ void OpenGL::Render()
     
 
     DrawObject();
-
     DrawWorldAxisIndicator(width, height);
+
+    
+
     SwapBuffers(m_hDC);
 }
 
@@ -186,6 +188,7 @@ void OpenGL::DrawObject()
    OpenGLRenderer renderer;
    renderer.SetFontListBase(m_fontListBase);
    renderer.Draw(ObjectContainer::Get(),Getzoom());
+   renderer.CenterView();
 }
 
 void OpenGL::SetupProjection(int width, int height)
@@ -226,28 +229,21 @@ void OpenGL::SetupViewTransform()
 
     if (m_style == Viewer3D)
     {
-        // 타겟 위치 (중심)
-        float targetX = m_offsetX;
-        float targetY = m_offsetY;
-        float targetZ = 0.0f;
+        float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f, modelSize = 1.0f;
+        ObjectContainer::Get().ComputeCenterAndSize(centerX, centerY, centerZ, modelSize);
 
-        float distance = -m_offsetZ;  // distance는 양수화
+        float zoomScale = powf(1.0f, m_offsetZ);  
+        float distance = modelSize * 2.5f * zoomScale;
 
-        // 각도 → 라디안
         float pitchRad = m_pitch * 3.1415926f / 180.0f;
         float yawRad = m_yaw * 3.1415926f / 180.0f;
 
+        float camX = centerX + distance * cosf(pitchRad) * sinf(yawRad);
+        float camY = centerY + distance * sinf(pitchRad);
+        float camZ = centerZ + distance * cosf(pitchRad) * cosf(yawRad);
 
-        // ✅ 정확한 카메라 위치 (구면 좌표계 기준)
-        float camX = targetX + distance * cosf(pitchRad) * sinf(yawRad);
-        float camY = targetY + distance * sinf(pitchRad);
-        float camZ = targetZ + distance * cosf(pitchRad) * cosf(yawRad);
-
-
-
-        // ✅ gluLookAt (카메라 → 타겟)
         gluLookAt(camX, camY, camZ,
-            targetX, targetY, targetZ,
+            centerX, centerY, centerZ,
             0.0f, 1.0f, 0.0f);
 
         glEnable(GL_DEPTH_TEST);
@@ -261,6 +257,8 @@ void OpenGL::SetupViewTransform()
     GLfloat lightPos[] = { 0.0f, 0.0f, 5.0f, 1.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 }
+
+
 
 void OpenGL::DrawWorldAxisIndicator(int screenWidth, int screenHeight)
 {
