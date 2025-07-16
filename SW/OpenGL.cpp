@@ -4,6 +4,8 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 
+
+
 OpenGL::OpenGL()
 {
 }
@@ -43,7 +45,7 @@ bool OpenGL::init(HWND hWnd, ViewerStyle Style)
 
     if (m_style != Viewer2D && m_style != Viewer3D) return false;
      m_style = Style;
-     Setzoom(-5.0f);
+     Setzoom(-10.0f);
  
     // 위에서 정한 픽셀값을 정의함-> 이 시점부터 DC는 opengl dc가 됨.
     if (!SetPixelFormat(m_hDC, pixelFormat, &pfd)) return false;
@@ -153,16 +155,24 @@ void OpenGL::Render()
     // 매 프레임 뷰포트 재확인
     glViewport(0, 0, width, height);
 
+    OpenGLRenderer renderer;
+    float cx, cy, cz, size;
+    renderer.GetModelCenter(cx, cy, cz, size);
+    m_centerX = cx;
+    m_centerY = cy;
+    m_centerZ = cz;
+    m_modelSize = size;
+
     // 뷰 세팅
     SetupViewTransform();
     // 화면 클리어
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    
-
     DrawObject();
     DrawWorldAxisIndicator(width, height);
+
+    
 
     
 
@@ -188,7 +198,7 @@ void OpenGL::DrawObject()
    OpenGLRenderer renderer;
    renderer.SetFontListBase(m_fontListBase);
    renderer.Draw(ObjectContainer::Get(),Getzoom());
-   renderer.CenterView();
+
 }
 
 void OpenGL::SetupProjection(int width, int height)
@@ -221,7 +231,6 @@ void OpenGL::SetupProjection(int width, int height)
 }
 
 
-
 void OpenGL::SetupViewTransform()
 {
     glMatrixMode(GL_MODELVIEW);
@@ -229,18 +238,41 @@ void OpenGL::SetupViewTransform()
 
     if (m_style == Viewer3D)
     {
-        float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f, modelSize = 1.0f;
-        ObjectContainer::Get().ComputeCenterAndSize(centerX, centerY, centerZ, modelSize);
-
-        float zoomScale = powf(1.0f, m_offsetZ);  
-        float distance = modelSize * 2.5f * zoomScale;
-
         float pitchRad = m_pitch * 3.1415926f / 180.0f;
         float yawRad = m_yaw * 3.1415926f / 180.0f;
 
-        float camX = centerX + distance * cosf(pitchRad) * sinf(yawRad);
-        float camY = centerY + distance * sinf(pitchRad);
-        float camZ = centerZ + distance * cosf(pitchRad) * cosf(yawRad);
+        float centerX = m_centerX;
+        float centerY = m_centerY;
+        float centerZ = m_centerZ;
+        float modelSize = std::max(m_modelSize, 2.0f);
+
+        float zoomBase = 1.2f;
+        float zoomScale = powf(zoomBase, m_offsetZ);
+        float distance = modelSize * 6.0f * zoomScale;
+
+        float dirX = sinf(yawRad) * cosf(pitchRad);
+        float dirY = sinf(pitchRad);
+        float dirZ = cosf(yawRad) * cosf(pitchRad);
+
+        float rightX = cosf(yawRad);
+        float rightY = 0.0f;
+        float rightZ = -sinf(yawRad);
+
+        float upX = 0.0f;
+        float upY = 1.0f;
+        float upZ = 0.0f;
+
+        float moveX = m_offsetX * rightX + m_offsetY * upX;
+        float moveY = m_offsetX * rightY + m_offsetY * upY;
+        float moveZ = m_offsetX * rightZ + m_offsetY * upZ;
+
+        centerX += moveX;
+        centerY += moveY;
+        centerZ += moveZ;
+
+        float camX = centerX + distance * dirX;
+        float camY = centerY + distance * dirY;
+        float camZ = centerZ + distance * dirZ;
 
         gluLookAt(camX, camY, camZ,
             centerX, centerY, centerZ,
@@ -257,6 +289,7 @@ void OpenGL::SetupViewTransform()
     GLfloat lightPos[] = { 0.0f, 0.0f, 5.0f, 1.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 }
+
 
 
 
@@ -476,11 +509,6 @@ void OpenGL::HandleMouseClick(int mouseX, int mouseY)
         int cx = m_axisViewport.left + m_axisViewport.Width() / 2;
         int cy = m_axisViewport.top + m_axisViewport.Height() / 2;
 
-        if (abs(mouseX - cx) < 10 && abs(mouseY - cy) < 10)
-        {
-            ResetViewPoint();
-            Render();
-        }
     }
 }
 

@@ -29,7 +29,7 @@ ViewProgramTopMenu::~ViewProgramTopMenu()
 
 void ViewProgramTopMenu::UpdateLayerControl(int cx, int cy)
 {
-
+	GetDlgItem(IDC_BTN_DATA_TEST)->MoveWindow(cx / 2, 5, 200, cy - 10);
 }
 
 BOOL ViewProgramTopMenu::OnInitDialog()

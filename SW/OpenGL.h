@@ -3,6 +3,7 @@
 #include "pch.h"
 #include <gl/GL.h>
 #include <gl/GLU.h>
+#include <cmath>
 #include "OpenGLRenderer.h"
 
 enum ViewerStyle
@@ -27,7 +28,9 @@ public:
 	float Getzoom();
 	void Render();
 	void SetRotation(float picth, float roll, float yaw);
-
+	float GetYaw() { return m_yaw; }
+	float GetPitch() { return m_pitch; }
+	
 	void DrawObject();
 
 	void SetupProjection(int width, int height);
@@ -71,5 +74,11 @@ private:
 	GLuint m_fontListBase = 0;
 	CRect m_axisViewport;     
 	bool m_axisHovered = false;
+
+
+	float m_centerX ;
+	float m_centerY ;
+	float m_centerZ ;
+	float m_modelSize ;
 };
 

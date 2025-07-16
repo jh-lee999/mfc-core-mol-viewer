@@ -43,13 +43,10 @@ public:
     }
     void SetFontListBase(GLuint base) { m_fontListBase = base; }
     void CenterView();
+    void GetModelCenter(float& outX, float& outY, float& outZ, float& outSize);
 
 private:
     void DrawAtom(const Atom& atom, float zoom);
     void DrawBond(const Bond& bond, float zoom);
-
-    
-
-    void DrawText3D(const std::string& text, float x, float y, float z);
     GLuint m_fontListBase = 0;
 };

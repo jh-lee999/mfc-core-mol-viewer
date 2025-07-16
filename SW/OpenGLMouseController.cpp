@@ -40,8 +40,24 @@ void OpenGLMouseController::UpdateDrag(UINT nFlags, CPoint pt, ViewerStyle style
     }
     else if ((nFlags & MK_RBUTTON) || (nFlags & MK_MBUTTON))
     {
-        m_offsetX -= dx * scale;
-        m_offsetY += dy * scale;  
+        float yawRad = gl.GetYaw() * 3.1415926f / 180.0f;
+        float pitchRad = gl.GetPitch() * 3.1415926f / 180.0f;
+
+        float scale = 0.006f * gl.Getzoom(); // 또는 적절히 튜닝
+
+        // 카메라 기준 좌/우 (right), 위/아래 (up) 벡터
+        float rightX = cosf(yawRad);
+        float rightY = 0;
+        float rightZ = -sinf(yawRad);
+
+        float upX = 0.0f;
+        float upY = 1.0f;
+        float upZ = 0.0f;
+
+        m_offsetX -= dx * rightX * scale + dy * upX * scale;
+        m_offsetY += dx * rightY * scale + dy * upY * scale;
+
+        gl.Setoffset(m_offsetX, m_offsetY);
     }
 
     m_lastMouse = pt;

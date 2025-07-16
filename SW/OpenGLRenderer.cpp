@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "OpenGLRenderer.h"
 
 #include <cmath>
@@ -16,35 +16,12 @@ void OpenGLRenderer::DrawAtom(const Atom& atom, float zoom)
     glPushMatrix();
     glTranslatef(atom.x, atom.y, atom.z);
 
-    // --- ±¸Ã¼ ±×¸®±â ---
     GLUquadric* quad = gluNewQuadric();
     gluQuadricNormals(quad, GLU_SMOOTH);
-    gluSphere(quad, atom.mol_size * 0.2f, 32, 32);  // ¹ÝÁö¸§, slice, stack
+    gluSphere(quad, atom.mol_size * 0.2f, 32, 32);
     gluDeleteQuadric(quad);
 
-    // --- ÅØ½ºÆ® ·»´õ¸µ ---
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glColor3f(0.0f, 0.0f, 0.0f);  // °ËÁ¤ ±ÛÀÚ
-
-    float zoomScale = 1.2f;
-    float scaleFactor = std::clamp(1.0f / std::fabs(zoom * zoomScale), 0.4f, 5.0f);
-
-    glPushMatrix();
-    glScalef(scaleFactor, scaleFactor, 1.0f);  // È®´ë ¸ÕÀú
-
-    glRasterPos3f(0.0f, 0.0f, atom.mol_size * 0.21f);
-
-    const char* label = atom.name.c_str();
-    for (const char* c = label; *c; ++c)
-        glCallList(m_fontListBase + (unsigned char)*c);
-
-    glPopMatrix(); 
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-
-    glPopMatrix();  
+    glPopMatrix();
 }
 
 
@@ -55,45 +32,64 @@ void OpenGLRenderer::DrawBond(const Bond& bond, float zoom)
     const Atom* to = ObjectContainer::Get().GetAtomObject(bond.to_id);
     if (!from || !to) return;
 
-    // À§Ä¡ º¤ÅÍ Â÷ÀÌ
     float dx = to->x - from->x;
     float dy = to->y - from->y;
     float dz = to->z - from->z;
 
-    // ±æÀÌ
     float length = sqrtf(dx * dx + dy * dy + dz * dz);
     if (length < 1e-6f) return;
 
-    // ´ÜÀ§ ¹æÇâ º¤ÅÍ
     float ux = dx / length;
     float uy = dy / length;
     float uz = dz / length;
 
-    // È¸ÀüÃà: ¿øÅëÀ» zÃà ±âÁØÀ¸·Î ¸¸µé°í, (dx,dy,dz) ÂÊÀ¸·Î È¸Àü
-    float angle = acosf(uz) * 180.0f / 3.14159f;
-    float rx = -dy;
-    float ry = dx;
-    float rz = 0.0f;
+    // ê²°í•© ë²¡í„°ì— ìˆ˜ì§ì¸ ë°©í–¥ ë²¡í„° ê³„ì‚°
+    float nx = -uy;
+    float ny = ux;
+    float nz = 0.0f;
+    float nLength = sqrtf(nx * nx + ny * ny + nz * nz);
+    if (nLength < 1e-6f) {
+        // ê²°í•©ì´ XY í‰ë©´ì— ìˆ˜ì§ì´ë©´ Zì¶•ìœ¼ë¡œ ì˜¤í”„ì…‹ ë²¡í„° ì„¤ì •
+        nx = 0;
+        ny = -uz;
+        nz = uy;
+        nLength = sqrtf(nx * nx + ny * ny + nz * nz);
+    }
+    nx /= nLength;
+    ny /= nLength;
+    nz /= nLength;
 
-    glPushMatrix();
+    // ê¸°ë³¸ ì˜¤í”„ì…‹ ê°„ê²©
+    float offsetScale = 0.2f;
+    int bondCount = bond.bond_order;
 
-    // ½ÃÀÛÁ¡À¸·Î ÀÌµ¿
-    glTranslatef(from->x, from->y, from->z);
+    for (int i = 0; i < bondCount; ++i)
+    {
+        // ê°€ìš´ë°ë¶€í„° ì¢Œìš°ë¡œ ê· ë“±í•˜ê²Œ ë°°ì¹˜: (-1, 0, 1) ë“±
+        float offset = (i - (bondCount - 1) / 2.0f) * offsetScale;
 
-    // È¸Àü (´Ü, zÃà°ú ¹æÇâÀÌ ¿ÏÀüÈ÷ °°À» °æ¿ì¿¡´Â È¸ÀüÇÒ ÇÊ¿ä ¾øÀ½)
-    if (fabsf(uz) < 0.9999f)
-        glRotatef(angle, rx, ry, rz);
+        float fx = from->x + offset * nx;
+        float fy = from->y + offset * ny;
+        float fz = from->z + offset * nz;
 
-    // »ö»ó
-    glColor3f(0.99f, 0.99f, 0.99f);
+        glPushMatrix();
+        glTranslatef(fx, fy, fz);
 
-    // ¿øÅë ±×¸®±â
-    GLUquadric* quad = gluNewQuadric();
-    float radius = 0.01f * bond.bond_order;  // °áÇÕ Â÷¼ö µû¶ó µÎ²²
-    gluCylinder(quad, radius, radius, length, 12, 1);
-    gluDeleteQuadric(quad);
+        float angle = acosf(uz) * 180.0f / 3.14159f;
+        float rx = -dy;
+        float ry = dx;
+        float rz = 0.0f;
+        if (fabsf(uz) < 0.9999f)
+            glRotatef(angle, rx, ry, rz);
 
-    glPopMatrix();
+        glColor3f(0.99f, 0.99f, 0.99f);
+        GLUquadric* quad = gluNewQuadric();
+        float radius = 0.03f;
+        gluCylinder(quad, radius, radius, length, 12, 1);
+        gluDeleteQuadric(quad);
+
+        glPopMatrix();
+    }
 }
 
 void OpenGLRenderer::CenterView()
@@ -109,7 +105,7 @@ void OpenGLRenderer::CenterView()
     float sizeZ = box.maxZ - box.minZ;
     float maxSize = std::max({ sizeX, sizeY, sizeZ });
 
-    // Ä«¸Þ¶ó¸¦ ZÃà µÚ·Î »«´Ù (¿øÀÚ ÀüÃ¼°¡ º¸ÀÌµµ·Ï)
+    // ì¹´ë©”ë¼ë¥¼ Zì¶• ë’¤ë¡œ ëº€ë‹¤ (ì›ìž ì „ì²´ê°€ ë³´ì´ë„ë¡)
     float cameraDistance = maxSize * 2.5f;
 
     glMatrixMode(GL_MODELVIEW);
@@ -122,11 +118,15 @@ void OpenGLRenderer::CenterView()
     );
 }
 
-
-void OpenGLRenderer::DrawText3D(const std::string& text, float x, float y, float z)
+void OpenGLRenderer::GetModelCenter(float& outX, float& outY, float& outZ, float& outSize)
 {
-    glColor3f(1.0f, 1.0f, 1.0f);  // Èò»ö ÅØ½ºÆ®
-    glRasterPos3f(x, y, z);
-    for (char c : text)
-        glCallList(m_fontListBase + (unsigned char)c);
+    BoundingBox box = ComputeBoundingBox();
+    outX = (box.minX + box.maxX) / 2.0f;
+    outY = (box.minY + box.maxY) / 2.0f;
+    outZ = (box.minZ + box.maxZ) / 2.0f;
+
+    float sizeX = box.maxX - box.minX;
+    float sizeY = box.maxY - box.minY;
+    float sizeZ = box.maxZ - box.minZ;
+    outSize = std::max({ sizeX, sizeY, sizeZ });
 }
